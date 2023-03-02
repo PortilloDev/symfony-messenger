@@ -1,0 +1,64 @@
+version: '3.0'
+
+services:
+
+  wine-api-db:
+    container_name: wine-api-db
+    image: mysql:8.0
+    ports:
+      - 33004:3306
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ro${MYSQL_ROOT_PASSWORD}
+    command: mysqld --sql_mode="STRICT_ALL_TABLES,NO_ENGINE_SUBSTITUTION"
+    volumes:
+      - wine-api-db-data:/var/lib/mysql
+    networks:
+      - wine-back
+
+  wine-api-app:
+    container_name: wine-api-app
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        TIMEZONE: ${TIMEZONE}
+    volumes:
+      - ./app/:/var/www/html
+    networks:
+      - wine-back
+
+  wine-api-back:
+    container_name: wine-api-back
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    env_file:
+      - .env
+    environment:
+      XDEBUG_CONFIG: client_host=host.docker.internal
+    ports:
+      - 8004:80
+    volumes:
+      - ./app/:/var/www/html
+    networks:
+      - wine-back
+  smp-rabbitmq:
+    container_name: smp-rabbitmq
+    image: rabbitmq:3-management
+    volumes:
+      - ./docker/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    ports:
+      - 5672:5672
+      - 15672:15672
+    networks:
+      - wine-back
+
+volumes:
+  wine-api-db-data:
+
+networks:
+  wine-back:
+
