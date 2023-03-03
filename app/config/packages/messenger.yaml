@@ -1,0 +1,22 @@
+framework:
+    messenger:
+#        Si se descomenta las líneas de serializer se envía un json en lugar de la clase php
+#        serializer:
+#            default_serializer: messenger.transport.symfony_serializer
+#            symfony_serializer:
+#                format: json
+#                context: {}
+        transports:
+             async:
+                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                 options:
+                     vhost: '%env(string:MESSENGER_VHOST)%'
+                     exchange:
+                         name: '%env(string:MESSENGER_EXCHANGE)%'
+                         type: direct
+                     queues:
+                         default_queue:
+                             binding_keys: [ default_queue ]
+
+        routing:
+             'App\Messenger\Message\DefaultAsyncMessage': async

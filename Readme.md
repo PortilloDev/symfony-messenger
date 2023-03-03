@@ -11,3 +11,11 @@
 
 
 Los proyectos se deben incluir dentro de la carpeta app
+
+## Comandos para ejecutar los mensajes
+```
+ De forma sincrona: sf app:messenger:send-sync
+```
+```
+ De forma asincrona: sf app:messenger:send-async
+```
